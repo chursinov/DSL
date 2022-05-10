@@ -1,8 +1,9 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Parser {
     int iterator = 0;
-    public LinkedList<Token> tokens = new LinkedList<Token>();
+    public LinkedList<Token> tokens = new LinkedList<>();
     public int len;
     Parser(LinkedList<Token> tokens, int len) {
         this.tokens = tokens;

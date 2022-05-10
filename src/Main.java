@@ -4,10 +4,14 @@ public class Main {
 
     public static void main(String[] args) throws ParseExc {
         String[] exp = {
-                "b = 6;"};
+                "b = 7;",
+                "a = 7;",
+        "IF (a < 5) a = a + 1;",
+        "IF (b < 5) b = 123;",
+        "b = b + 1;"};//"WHILE (a < 10) b = 567 + 1;"
         int len = exp.length;
         TokenType lex = new TokenType();
-        LinkedList<Token> tokens = new LinkedList<Token>();
+        LinkedList<Token> tokens = new LinkedList<>();
         String str_1 = "";
         for (int j = 0; j < exp.length;j++){
             for (int i = 0; i < exp[j].length(); i++) {
@@ -36,6 +40,6 @@ public class Main {
         Parser par = new Parser(tokens, len);
         par.lang();
         Inter inter = new Inter(tokens);
-        inter.getVariables();
+        System.out.println(inter.getVariables());
     }
 }

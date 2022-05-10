@@ -1,9 +1,13 @@
 import java.util.*;
 
+import static java.lang.Double.compare;
+import static java.lang.Double.parseDouble;
+
 public class Inter {
 
     private LinkedList<Token> infixExpr;
     private Map<String, Double> variables = new HashMap<>();
+    boolean result_comparison_bool = true;
 
     private int operationPriority(Token op) {
         return switch (op.token) {
@@ -37,9 +41,82 @@ public class Inter {
                 indexVar = i - 1;
                 temp = i + 1;
             }
+            if (infixExpr.get(i).type == "WHILE"){
+                int first_argument_index = i + 2;
+                int second_argument_index = i + 4;
+                int comparison_op_index = i + 3;
+                int resultComparison = 0;
+                double second_argument = 0;
+                double first_argument = variables.get(infixExpr.get(first_argument_index).token);
+                while (result_comparison_bool){
+                    first_argument = variables.get(infixExpr.get(first_argument_index).token);
+                    System.out.println(first_argument);
+                    if (infixExpr.get(second_argument_index).type == "DIGIT"){
+                        second_argument = parseDouble(infixExpr.get(second_argument_index).token);
+                    }
+                    if (infixExpr.get(second_argument_index).type == "VAR"){
+                        second_argument = variables.get(infixExpr.get(second_argument_index).token);
+                    }
+                    switch (infixExpr.get(comparison_op_index).token){
+                        case ">":
+                            if (compare(first_argument, second_argument) == 1)
+                                result_comparison_bool = true;
+                            else result_comparison_bool = false;
+                            break;
+                        case "~":
+                            if (compare(first_argument, second_argument) == 0)
+                                result_comparison_bool = true;
+                            else result_comparison_bool = false;
+                            break;
+                        case "<":
+                            if (compare(first_argument, second_argument) == -1)
+                                result_comparison_bool = true;
+                            else result_comparison_bool = false;
+                            break;
+                    }
+                }
+            }
+            if (infixExpr.get(i).type == "IF OPERATION"){
+                int first_argument_index = i + 2;
+                int second_argument_index = i + 4;
+                int comparison_op_index = i + 3;
+                int resultComparison = 0;
+                double second_argument = 0;
+                double first_argument = variables.get(infixExpr.get(first_argument_index).token);
+                if (infixExpr.get(second_argument_index).type == "DIGIT"){
+                    second_argument = parseDouble(infixExpr.get(second_argument_index).token);
+                }
+                if (infixExpr.get(second_argument_index).type == "VAR"){
+                    second_argument = variables.get(infixExpr.get(second_argument_index).token);
+                }
+                switch (infixExpr.get(comparison_op_index).token){
+                    case ">":
+                        if (compare(first_argument, second_argument) == 1)
+                            result_comparison_bool = true;
+                        else result_comparison_bool = false;
+                        break;
+                    case "~":
+                        if (compare(first_argument, second_argument) == 0)
+                            result_comparison_bool = true;
+                        else result_comparison_bool = false;
+                        break;
+                    case "<":
+                        if (compare(first_argument, second_argument) == -1)
+                            result_comparison_bool = true;
+                        else result_comparison_bool = false;
+                        break;
+                }
+                if (result_comparison_bool == false) {
+                    while (infixExpr.get(i).type != "ENDLINE"){
+                        i++;
+                    }
+                    i++;
+                    result_comparison_bool = true;
+                }
+            }
             if (infixExpr.get(i).type == "ENDLINE") {
                 double rez = calc(toPostfix(infixExpr, temp, i));
-                variables.put(infixExpr.get(indexVar).type, rez);
+                variables.put(infixExpr.get(indexVar).token, rez);
             }
         }
     }
@@ -54,7 +131,6 @@ public class Inter {
         for (int i = start; i < end; i++) {
             //	Текущий символ
             Token c = infixExpr.get(i);
-
             //	Если симовол - цифра
             if (c.type == "DIGIT" || c.type == "VAR") {
                 postfixExpr.add(c);
@@ -96,13 +172,13 @@ public class Inter {
 
             //	Если символ число
             if (c.type == "DIGIT") {
-                String number = c.type;
+                String number = c.token;
                 locals.push(Double.parseDouble(number));
             } else if (c.type == "VAR") {
-                locals.push(variables.get(c.type));
+                locals.push(variables.get(c.token));
             } else if (c.type == "OPERATOR") { //	Если символ есть в списке операторов
                 //	Прибавляем значение счётчику
-                counter += 1;
+                counter++;
 
                 //	Получаем значения из стека в обратном порядке
                 double second = locals.size() > 0 ? locals.pop() : 0,
