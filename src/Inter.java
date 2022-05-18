@@ -7,7 +7,10 @@ public class Inter {
 
     private LinkedList<Token> infixExpr;
     private Map<String, Double> variables = new HashMap<>();
-    boolean result_comparison_bool = true;
+
+    public int iterator;
+    public Token cur;
+    public boolean result_comparison_bool;
 
     private int operationPriority(Token op) {
         return switch (op.token) {
@@ -30,97 +33,164 @@ public class Inter {
 
     public Inter(LinkedList<Token> infixExpr) {
         this.infixExpr = infixExpr;
+        cur = infixExpr.get(0);
+        iterator = 0;
+        result_comparison_bool = false;
         run();
     }
 
     private void run() {
-        int temp = 0;
-        int indexVar = 0;
-        for (int i = 0; i < infixExpr.size(); i++) {
-            if (infixExpr.get(i).type == "ASSIGNMENT OPERATOR") {
-                indexVar = i - 1;
-                temp = i + 1;
-            }
-            if (infixExpr.get(i).type == "WHILE"){
-                int first_argument_index = i + 2;
-                int second_argument_index = i + 4;
-                int comparison_op_index = i + 3;
-                int resultComparison = 0;
-                double second_argument = 0;
-                double first_argument = variables.get(infixExpr.get(first_argument_index).token);
-                while (result_comparison_bool){
-                    first_argument = variables.get(infixExpr.get(first_argument_index).token);
-                    System.out.println(first_argument);
-                    if (infixExpr.get(second_argument_index).type == "DIGIT"){
-                        second_argument = parseDouble(infixExpr.get(second_argument_index).token);
-                    }
-                    if (infixExpr.get(second_argument_index).type == "VAR"){
-                        second_argument = variables.get(infixExpr.get(second_argument_index).token);
-                    }
-                    switch (infixExpr.get(comparison_op_index).token){
-                        case ">":
-                            if (compare(first_argument, second_argument) == 1)
-                                result_comparison_bool = true;
-                            else result_comparison_bool = false;
-                            break;
-                        case "~":
-                            if (compare(first_argument, second_argument) == 0)
-                                result_comparison_bool = true;
-                            else result_comparison_bool = false;
-                            break;
-                        case "<":
-                            if (compare(first_argument, second_argument) == -1)
-                                result_comparison_bool = true;
-                            else result_comparison_bool = false;
-                            break;
-                    }
-                }
-            }
-            if (infixExpr.get(i).type == "IF OPERATION"){
-                int first_argument_index = i + 2;
-                int second_argument_index = i + 4;
-                int comparison_op_index = i + 3;
-                int resultComparison = 0;
-                double second_argument = 0;
-                double first_argument = variables.get(infixExpr.get(first_argument_index).token);
-                if (infixExpr.get(second_argument_index).type == "DIGIT"){
-                    second_argument = parseDouble(infixExpr.get(second_argument_index).token);
-                }
-                if (infixExpr.get(second_argument_index).type == "VAR"){
-                    second_argument = variables.get(infixExpr.get(second_argument_index).token);
-                }
-                switch (infixExpr.get(comparison_op_index).token){
-                    case ">":
-                        if (compare(first_argument, second_argument) == 1)
-                            result_comparison_bool = true;
-                        else result_comparison_bool = false;
-                        break;
-                    case "~":
-                        if (compare(first_argument, second_argument) == 0)
-                            result_comparison_bool = true;
-                        else result_comparison_bool = false;
-                        break;
-                    case "<":
-                        if (compare(first_argument, second_argument) == -1)
-                            result_comparison_bool = true;
-                        else result_comparison_bool = false;
-                        break;
-                }
-                if (result_comparison_bool == false) {
-                    while (infixExpr.get(i).type != "ENDLINE"){
-                        i++;
-                    }
-                    i++;
-                    result_comparison_bool = true;
-                }
-            }
-            if (infixExpr.get(i).type == "ENDLINE") {
-                double rez = calc(toPostfix(infixExpr, temp, i));
-                variables.put(infixExpr.get(indexVar).token, rez);
+        for (; iterator < infixExpr.size(); iterator++) {
+            cur = infixExpr.get(iterator);
+            switch (cur.type) {
+                case "ASSIGNMENT OPERATOR" -> value_inter("ENDLINE");
+                case "IF OPERATION" -> if_inter();
+                case "WHILE" -> interpret_while();
+                case "DO" -> interpret_do_while();
+                case "FOR" -> interpret_for();
+                case "PRINT" -> interpret_print();
             }
         }
     }
 
+    private void interpret_print() {
+        iterator++;
+        cur = infixExpr.get(iterator);
+        if ("L_BRACKET".equals(cur.type)) {
+            Token c = infixExpr.get(iterator + 1);
+            switch (c.type) {
+                case "DIGIT" -> System.out.println(Double.parseDouble(c.token));
+                case "VAR" -> System.out.println(c.token + " = " + variables.get(c.token));
+            }
+            iterator += 2;
+        } else {
+            System.out.println(variables);
+        }
+    }
+
+
+
+    private void interpret_do_while() {
+        iterator += 2;
+        cur = infixExpr.get(iterator);
+        int start_iteration = iterator;
+
+        do {
+            value_inter("WHILE");
+            condition_check();
+            iterator = start_iteration;
+            cur = infixExpr.get(iterator);
+        } while (result_comparison_bool);
+
+        while (!"ENDLINE".equals(cur.type)) {
+            iterator++;
+            cur = infixExpr.get(iterator);
+        }
+    }
+
+    private void interpret_while() {
+        int start_iteration = iterator;
+        condition_check();
+        while (result_comparison_bool) {
+            iterator++;
+            value_inter("ENDLINE");
+            iterator = start_iteration;
+            cur = infixExpr.get(iterator);
+            condition_check();
+        }
+
+        while (!"ENDLINE".equals(cur.type)) {
+            iterator++;
+            cur = infixExpr.get(iterator);
+        }
+    }
+
+    public void if_inter(){
+        condition_check();
+        System.out.println(result_comparison_bool);
+        if (!result_comparison_bool) {
+            while (!"ENDLINE".equals(cur.type)) {
+                if ("ELSE".equals(cur.type)) {
+                    break;
+                }
+                iterator++;
+                cur = infixExpr.get(iterator);
+            }
+        } else {
+            iterator++;
+            value_inter("ELSE");
+            while (!"ENDLINE".equals(cur.type)) {
+                iterator++;
+                cur = infixExpr.get(iterator);
+            }
+        }
+    }
+    private void interpret_for() {
+        iterator += 3;
+        cur = infixExpr.get(iterator);
+        value_inter("DIV");
+        iterator--;
+        int condition = iterator;
+        condition_check();
+        System.out.println(result_comparison_bool);
+        int indexAfterFor = iterator + 1;
+        while (result_comparison_bool) {
+            while (!"R_BRACKET".equals(cur.type)) {
+                iterator++;
+                cur = infixExpr.get(iterator);
+            }
+            iterator += 2;
+            cur = infixExpr.get(iterator);
+            value_inter("ENDLINE");
+
+            iterator = indexAfterFor;
+            cur = infixExpr.get(iterator);
+            value_inter("R_BRACKET");
+
+            iterator = condition;
+            condition_check();
+        }
+
+        while (!"ENDLINE".equals(cur.type)) {
+            iterator++;
+            cur = infixExpr.get(iterator);
+        }
+    }
+    public void value_inter(String trans){
+        int indexVar = iterator - 1;
+        int startExpr = iterator + 1;
+        while (!trans.equals(cur.type)) {
+            iterator++;
+            cur = infixExpr.get(iterator);
+        }
+
+        double rez = calc(toPostfix(infixExpr, startExpr, iterator));
+        variables.put(infixExpr.get(indexVar).token, rez);
+    }
+    public void condition_check(){
+        int first_argument_index = iterator + 2;
+        int second_argument_index = iterator + 4;
+        int comparison_op_index = iterator + 3;
+        Token s = infixExpr.get(second_argument_index);
+        double first_argument = variables.get(infixExpr.get(first_argument_index).token);
+        double second_argument = switch (s.type){
+            case "DIGIT" -> Double.parseDouble(s.token);
+            case "VAR" -> variables.get(s.token);
+            default -> 0.0;
+        };
+        iterator = iterator + 6;
+        cur = infixExpr.get(iterator);
+        result_comparison_bool = compare(infixExpr.get(comparison_op_index), first_argument, second_argument);
+    }
+
+    private boolean compare(Token comp, double first_argument, double second_argument) {
+        return switch (comp.token){
+            case ">" -> Double.compare(first_argument, second_argument) == 1;
+            case "<" -> Double.compare(first_argument, second_argument) == -1;
+            case "~" -> Double.compare(first_argument, second_argument) == 0;
+            default -> throw new IllegalArgumentException("Illegal value: " + comp.token);
+        };
+    }
     private LinkedList<Token> toPostfix(LinkedList<Token> infixExpr, int start, int end) {
         //	Выходная строка, содержащая постфиксную запись
         LinkedList<Token> postfixExpr = new LinkedList<>();

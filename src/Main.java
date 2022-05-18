@@ -4,11 +4,15 @@ public class Main {
 
     public static void main(String[] args) throws ParseExc {
         String[] exp = {
-                "b = 7;",
-                "a = 7;",
-        "IF (a < 5) a = a + 1;",
-        "IF (b < 5) b = 123;",
-        "b = b + 1;"};//"WHILE (a < 10) b = 567 + 1;"
+                "b = 5;",
+                "a = 10;",
+        "IF (a ~ 54) a = 33 ELSE a = 66;",
+        "WHILE (a > 60) a = a - 1;",
+        "FOR (i = 1 , i < 10, i = i + 1) b = b + 3;",
+        "DO i = i * 10 WHILE (i < 100000);",
+        "PRINT(b);",
+        "PRINT(i)",
+        "PRINT(a)"};
         int len = exp.length;
         TokenType lex = new TokenType();
         LinkedList<Token> tokens = new LinkedList<>();
@@ -37,9 +41,9 @@ public class Main {
         for (Token t : tokens) {
             System.out.println("Type of Regular Exp.: "+t.type + "; Token: " + t.token);
         }
-        Parser par = new Parser(tokens, len);
-        par.lang();
+        //Parser par = new Parser(tokens, len);
+        //par.lang();
         Inter inter = new Inter(tokens);
-        System.out.println(inter.getVariables());
+        //System.out.println(inter.getVariables());
     }
 }

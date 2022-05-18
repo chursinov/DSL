@@ -16,5 +16,9 @@ public class TokenType {
         regexp.put("ASSIGNMENT OPERATOR", "^=$");
         regexp.put("ENDLINE", "^\\;$");
         regexp.put("DO_WHILE", "^[D][O]$");
+        regexp.put("DIV","^,$");
+        regexp.put("PRINT","^[P][R][I][N][T]$");
+        regexp.put("FOR","^[F][O][R]$");
+        regexp.put("ELSE", "^[E][L][S][E]$");
     }
 }
