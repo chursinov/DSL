@@ -7,10 +7,13 @@ public class Inter {
 
     private LinkedList<Token> infixExpr;
     private Map<String, Double> variables = new HashMap<>();
+    private Map<String, String> LLvariables = new HashMap<>();
 
     public int iterator;
     public Token cur;
     public boolean result_comparison_bool;
+    public MyLinkedList list;
+    public String LinkedList_var;
 
     private int operationPriority(Token op) {
         return switch (op.token) {
@@ -49,8 +52,63 @@ public class Inter {
                 case "DO" -> interpret_do_while();
                 case "FOR" -> interpret_for();
                 case "PRINT" -> interpret_print();
+                case "LL" -> interpret_LL();
+                case "POINT" -> interpret_LL_operator();
             }
         }
+    }
+
+    private void interpret_LL_operator() {
+        int index_var = iterator - 1;
+        LinkedList_var = infixExpr.get(index_var).token;
+        int operator_index = iterator + 1;
+        cur = infixExpr.get(operator_index);
+        switch (cur.type){
+            case "LLadd" -> interpret_LL_add(list);
+        }
+    }
+
+    private void interpret_LL_add(MyLinkedList list) {
+        iterator++;
+        cur = infixExpr.get(iterator);
+        while (cur.type != "ENDLINE"){
+            if (cur.type == "LLadd"){
+                iterator++;
+                cur = infixExpr.get(iterator);
+                if (cur.type == "L_BRACKET"){
+                    iterator++;
+                    cur = infixExpr.get(iterator);
+                    if (cur.type == "DIGIT"){
+                        list.add(cur.token);
+                        iterator++;
+                        cur = infixExpr.get(iterator);
+                        if (cur.type == "R_BRACKET"){
+                            iterator++;
+                            cur = infixExpr.get(iterator);
+                        }
+                    }
+                }
+                iterator++;
+            }
+            iterator++;
+            cur = infixExpr.get(iterator);
+        }
+    }
+
+    private void interpret_LL() {
+        cur = infixExpr.get(iterator);
+        while (cur.type != "ENDLINE") {
+            if ("LL".equals(cur.type)) {
+                list = new MyLinkedList<>();
+                System.out.println("empty LinkedList created");
+            }
+            if ("VAR".equals(cur.type)) {
+                LLvariables.put(infixExpr.get(iterator).token, null);
+            }
+            iterator++;
+            cur = infixExpr.get(iterator);
+        }
+        iterator++;
     }
 
     private void interpret_print() {
@@ -265,5 +323,8 @@ public class Inter {
 
     public Map<String, Double> getVariables() {
         return variables;
+    }
+    public void getLLvariables() {
+        list.printLinkList();
     }
 }

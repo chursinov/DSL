@@ -20,5 +20,9 @@ public class TokenType {
         regexp.put("PRINT","^[P][R][I][N][T]$");
         regexp.put("FOR","^[F][O][R]$");
         regexp.put("ELSE", "^[E][L][S][E]$");
+        regexp.put("LL", "^LINKEDLIST$");
+        regexp.put("POINT", "^\\.$");
+        regexp.put("LLadd", "^[A][D][D]$");
+        regexp.put("PRINTLIST", "^PRINTLIST$");
     }
 }

@@ -10,9 +10,14 @@ public class Main {
         "WHILE (a > 60) a = a - 1;",
         "FOR (i = 1 , i < 10, i = i + 1) b = b + 3;",
         "DO i = i * 10 WHILE (i < 100000);",
+        "LINKEDLIST u;",
+        "u.ADD(5);",
+        "u.ADD(6);",
+        "u.ADD(18);",
+        "u.ADD(20);",
         "PRINT(b);",
-        "PRINT(i)",
-        "PRINT(a)"};
+        "PRINT(i);",
+        "PRINTLIST();"};
         int len = exp.length;
         TokenType lex = new TokenType();
         LinkedList<Token> tokens = new LinkedList<>();
@@ -44,6 +49,6 @@ public class Main {
         //Parser par = new Parser(tokens, len);
         //par.lang();
         Inter inter = new Inter(tokens);
-        //System.out.println(inter.getVariables());
+        inter.getLLvariables();
     }
 }
