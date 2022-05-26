@@ -23,6 +23,9 @@ public class TokenType {
         regexp.put("LL", "^LINKEDLIST$");
         regexp.put("POINT", "^\\.$");
         regexp.put("LLadd", "^[A][D][D]$");
-        regexp.put("PRINTLIST", "^PRINTLIST$");
+        regexp.put("LLremove", "^REMOVE$");
+        regexp.put("LLget", "^GET$");
+        regexp.put("PRTLIST", "^PRTLIST$");
+        regexp.put("LLsize", "^SIZE$");
     }
 }

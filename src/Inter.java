@@ -7,7 +7,7 @@ public class Inter {
 
     private LinkedList<Token> infixExpr;
     private Map<String, Double> variables = new HashMap<>();
-    private Map<String, String> LLvariables = new HashMap<>();
+    private Map<String, Object> LLvariables = new HashMap<>();
 
     public int iterator;
     public Token cur;
@@ -54,8 +54,26 @@ public class Inter {
                 case "PRINT" -> interpret_print();
                 case "LL" -> interpret_LL();
                 case "POINT" -> interpret_LL_operator();
+                case "PRTLIST" -> interpret_LL_printlist();
             }
         }
+    }
+
+    private void interpret_LL_printlist() {
+        cur = infixExpr.get(iterator);
+            if (cur.type == "PRTLIST") {
+                iterator++;
+                cur = infixExpr.get(iterator);
+                if (cur.type == "L_BRACKET"){
+                    iterator++;
+                    cur = infixExpr.get(iterator);
+                    if (cur.type == "VAR") {
+                        list.printLinkList();
+                        iterator++;
+                    }
+                }
+            }
+
     }
 
     private void interpret_LL_operator() {
@@ -64,14 +82,52 @@ public class Inter {
         int operator_index = iterator + 1;
         cur = infixExpr.get(operator_index);
         switch (cur.type){
-            case "LLadd" -> interpret_LL_add(list);
+            case "LLadd" -> interpret_LL_add();
+            case "LLremove" -> interpret_LL_remove();
+            case "LLget" -> interpret_LL_get();
+            case "LLsize" -> interpret_LL_size();
         }
     }
 
-    private void interpret_LL_add(MyLinkedList list) {
+    private void interpret_LL_size() {
         iterator++;
         cur = infixExpr.get(iterator);
-        while (cur.type != "ENDLINE"){
+        if (infixExpr.get(iterator + 1).type == "L_BRACKET"){
+            System.out.println("Size = " + list.size());
+        }
+    }
+
+    private void interpret_LL_get() {
+        iterator++;
+        cur = infixExpr.get(iterator);
+        if (cur.type == "LLget"){
+            iterator+=2;
+            cur = infixExpr.get(iterator);
+            if (cur.type == "DIGIT"){
+                System.out.println(list.get(Integer.parseInt(cur.token)));
+            }
+        }
+        iterator++;
+        cur = infixExpr.get(iterator);
+    }
+
+    private void interpret_LL_remove() {
+        iterator++;
+        cur = infixExpr.get(iterator);
+        if (cur.type == "LLremove"){
+            iterator+=2;
+            cur = infixExpr.get(iterator);
+            if (cur.type == "DIGIT"){
+                list.remove(cur.token);
+            }
+        }
+        iterator++;
+        cur = infixExpr.get(iterator);
+    }
+
+    private void interpret_LL_add() {
+        iterator++;
+        cur = infixExpr.get(iterator);
             if (cur.type == "LLadd"){
                 iterator++;
                 cur = infixExpr.get(iterator);
@@ -88,12 +144,9 @@ public class Inter {
                         }
                     }
                 }
-                iterator++;
             }
-            iterator++;
-            cur = infixExpr.get(iterator);
+            System.out.println(cur.type);
         }
-    }
 
     private void interpret_LL() {
         cur = infixExpr.get(iterator);
@@ -103,17 +156,17 @@ public class Inter {
                 System.out.println("empty LinkedList created");
             }
             if ("VAR".equals(cur.type)) {
-                LLvariables.put(infixExpr.get(iterator).token, null);
+                LLvariables.put(infixExpr.get(iterator).token, list);
             }
             iterator++;
             cur = infixExpr.get(iterator);
         }
-        iterator++;
     }
 
     private void interpret_print() {
         iterator++;
         cur = infixExpr.get(iterator);
+        System.out.println(cur.type);
         if ("L_BRACKET".equals(cur.type)) {
             Token c = infixExpr.get(iterator + 1);
             switch (c.type) {
@@ -124,6 +177,7 @@ public class Inter {
         } else {
             System.out.println(variables);
         }
+        iterator++;
     }
 
 
@@ -325,6 +379,5 @@ public class Inter {
         return variables;
     }
     public void getLLvariables() {
-        list.printLinkList();
     }
 }
