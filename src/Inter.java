@@ -1,13 +1,9 @@
 import java.util.*;
-
-import static java.lang.Double.compare;
-import static java.lang.Double.parseDouble;
-
 public class Inter {
 
     private LinkedList<Token> infixExpr;
     private Map<String, Double> variables = new HashMap<>();
-    private Map<String, Object> LLvariables = new HashMap<>();
+    private Map<String, MyLinkedList> LLvariables = new HashMap<>();
 
     public int iterator;
     public Token cur;
@@ -68,12 +64,12 @@ public class Inter {
                     iterator++;
                     cur = infixExpr.get(iterator);
                     if (cur.type == "VAR") {
-                        list.printLinkList();
+                        System.out.print("List " + cur.token + ": ");
+                        LLvariables.get(cur.token).printLinkList();
                         iterator++;
                     }
                 }
             }
-
     }
 
     private void interpret_LL_operator() {
@@ -93,7 +89,7 @@ public class Inter {
         iterator++;
         cur = infixExpr.get(iterator);
         if (infixExpr.get(iterator + 1).type == "L_BRACKET"){
-            System.out.println("Size = " + list.size());
+            System.out.println("Size = " + LLvariables.get(LinkedList_var).size() + "(Linked List " + LinkedList_var + ")");
         }
     }
 
@@ -104,7 +100,7 @@ public class Inter {
             iterator+=2;
             cur = infixExpr.get(iterator);
             if (cur.type == "DIGIT"){
-                System.out.println(list.get(Integer.parseInt(cur.token)));
+                System.out.println("element by index: " + cur.token + " = " + LLvariables.get(LinkedList_var).get(Integer.parseInt(cur.token)));
             }
         }
         iterator++;
@@ -118,7 +114,7 @@ public class Inter {
             iterator+=2;
             cur = infixExpr.get(iterator);
             if (cur.type == "DIGIT"){
-                list.remove(cur.token);
+                LLvariables.get(LinkedList_var).remove(Integer.parseInt(cur.token));
             }
         }
         iterator++;
@@ -135,7 +131,7 @@ public class Inter {
                     iterator++;
                     cur = infixExpr.get(iterator);
                     if (cur.type == "DIGIT"){
-                        list.add(cur.token);
+                        LLvariables.get(LinkedList_var).add(cur.token);
                         iterator++;
                         cur = infixExpr.get(iterator);
                         if (cur.type == "R_BRACKET"){
@@ -145,7 +141,6 @@ public class Inter {
                     }
                 }
             }
-            System.out.println(cur.type);
         }
 
     private void interpret_LL() {
@@ -156,7 +151,7 @@ public class Inter {
                 System.out.println("empty LinkedList created");
             }
             if ("VAR".equals(cur.type)) {
-                LLvariables.put(infixExpr.get(iterator).token, list);
+                LLvariables.put(cur.token, list);
             }
             iterator++;
             cur = infixExpr.get(iterator);
@@ -166,7 +161,6 @@ public class Inter {
     private void interpret_print() {
         iterator++;
         cur = infixExpr.get(iterator);
-        System.out.println(cur.type);
         if ("L_BRACKET".equals(cur.type)) {
             Token c = infixExpr.get(iterator + 1);
             switch (c.type) {
@@ -193,7 +187,6 @@ public class Inter {
             iterator = start_iteration;
             cur = infixExpr.get(iterator);
         } while (result_comparison_bool);
-
         while (!"ENDLINE".equals(cur.type)) {
             iterator++;
             cur = infixExpr.get(iterator);
@@ -219,7 +212,6 @@ public class Inter {
 
     public void if_inter(){
         condition_check();
-        System.out.println(result_comparison_bool);
         if (!result_comparison_bool) {
             while (!"ENDLINE".equals(cur.type)) {
                 if ("ELSE".equals(cur.type)) {
@@ -244,7 +236,6 @@ public class Inter {
         iterator--;
         int condition = iterator;
         condition_check();
-        System.out.println(result_comparison_bool);
         int indexAfterFor = iterator + 1;
         while (result_comparison_bool) {
             while (!"R_BRACKET".equals(cur.type)) {

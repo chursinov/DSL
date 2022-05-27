@@ -16,14 +16,22 @@ public class Main {
         "u.ADD(7);",
         "u.ADD(9);",
         "u.ADD(56);",
-        "u.REMOVE(9);",
-        "u.REMOVE(56);",
+        "u.REMOVE(1);",
+        "u.REMOVE(1);",
         "PRTLIST(u)",
         "u.ADD(12);",
         "u.ADD(890)",
         "u.GET(2);",
         "u.SIZE();",
-        "PRTLIST(u);",};
+        "PRTLIST(u);",
+        "LINKEDLIST p;",
+        "p.ADD(7);",
+        "p.ADD(8);",
+        "p.ADD(7)",
+        "p.ADD(8)",
+        "p.REMOVE(3)",
+        "PRTLIST(p);",
+        "p.SIZE();"};
         int len = exp.length;
         TokenType lex = new TokenType();
         LinkedList<Token> tokens = new LinkedList<>();
@@ -52,7 +60,7 @@ public class Main {
         for (Token t : tokens) {
             System.out.println("Type of Regular Exp.: "+t.type + "; Token: " + t.token);
         }
-        //Parser par = new Parser(tokens, len);
+        Parser par = new Parser(tokens, len);
         //par.lang();
         Inter inter = new Inter(tokens);
     }
